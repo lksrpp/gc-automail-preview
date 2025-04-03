@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GoodCrowd.org Automail Preview Tool</title>
+  <style>
+    /* Reset and base styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.5;
+      background-color: #f5f5f5;
+      color: #333;
+      margin: 0;
+    }
+    
+    .container {
+      display: flex;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      flex-direction: row; /* Default to row layout */
+    }
+    
+    /* Editor styles */
+    .editor-panel {
+      width: 30%;
+      min-width: 320px;
+      height: 100vh;
+      overflow-y: auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+    
+    .editor-section {
+      margin-bottom: 30px;
+    }
+    
+    .editor-section h2 {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #764FD7;
+    }
+    
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 14px;
+      resize: vertical;
+    }
+    
+    .content-textarea {
+      min-height: 250px;
+    }
+    
+    button {
+      background-color: #764FD7;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      margin-top: 20px;
+    }
+    
+    button:hover {
+      background-color: #5f3eb0;
+    }
+
+    .tip {
+      font-size: 13px;
+      color: #666;
+      margin-top: 5px;
+      font-style: italic;
+    }
+    
+    /* Preview styles */
+    .preview-panel {
+      width: 70%;
+      height: 100vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    
+    .preview-container {
+      width: 590px;
+      max-width: 100%;
+      margin: 0 auto;
+      transition: width 0.3s ease;
+    }
+    
+    .preview-container.mobile {
+      width: 365px;
+    }
+    
+    .preview-toggle {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    .device-toggle {
+      display: inline-flex;
+      background-color: #f0f0f0;
+      border-radius: 30px;
+      border: 1px solid #d3d3d3;
+      padding: 5px;
+      margin-bottom: 15px;
+    }
+    
+    .device-toggle button {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      color: #666;
+      transition: all 0.2s ease;
+      margin: 0;
+    }
+    
+    .device-toggle button.active {
+      background-color: #764FD7;
+      color: white;
+    }
+    
+    .email-container {
+      background-color: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      overflow: hidden;
+      width: 100%;
+      max-width: 590px;
+      margin: 0 auto;
+    }
+    
+    .email-header {
+      text-align: center;
+      padding: 30px 20px 20px;
+      background-color: #f5f5f5;
+    }
+    
+    .email-logo {
+      width: 207px;
+      height: auto;
+    }
+    
+    .email-content {
+      padding: 25px 30px 10px;
+    }
+    
+    .email-content p {
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    
+    .banner {
+      background-color: #764FD7;
+      color: white;
+      padding: 30px;
+      text-align: center;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+    }
+    
+    .banner-title {
+      font-size: 22px;
+      font-weight: 700;
+      padding-bottom: 10px;
+    }
+    
+    .banner-amount {
+      font-size: 42px;
+      font-weight: 700;
+      padding-bottom: 5px;
+    }
+    
+    .banner-date {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    
+    .content-section {
+      padding: 25px 30px;
+      border-top: 1px solid #EFEFEF;
+    }
+    
+    .content-section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    
+    .content-section p {
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+    
+    .content-section ul {
+      margin-bottom: 20px;
+      padding-left: 20px;
+    }
+    
+    .content-section li {
+      font-size: 14px;
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+    
+    .email-footer {
+      padding: 0 30px 25px;
+      background-color: #fff;
+      border-bottom-left-radius: 16px;
+      border-bottom-right-radius: 16px;
+    }
+    
+    .email-footer p {
+      font-size: 14px;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+    
+    .email-footer img {
+      display: block;
+      width: 125px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .email-legal {
+      padding: 15px 20px 30px;
+      background-color: #f5f5f5;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.5;
+    }
+    
+    .email-legal p {
+      margin-bottom: 15px;
+    }
+    
+    .email-legal a {
+      color: #764FD7;
+      text-decoration: none;
+    }
+    
+    .email-legal-divider {
+      border-top: 1px solid #E5E5E5;
+      margin: 10px 0;
+    }
+    
+    .mobile-preview-toggle {
+      display: none;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    /* Responsive design */
+    @media (max-width: 1024px) {
+      .container {
+        flex-direction: column; /* Stack panels on smaller screens */
+      }
+      
+      .editor-panel, .preview-panel {
+        width: 100%; /* Full width on smaller screens */
+        height: auto; /* Auto height instead of 100vh */
+        min-height: auto;
+      }
+      
+      .editor-panel {
+        position: relative;
+        min-width: 100%;
+        padding-bottom: 30px;
+      }
+      
+      .preview-panel {
+        padding-top: 30px;
+        border-top: 1px solid #ddd;
+      }
+      
+      /* Hide toggle button on smaller screens as we're showing both panels */
+      .mobile-preview-toggle {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Editor Panel -->
+    <div class="editor-panel">
+      <h1 style="margin-bottom: 20px; color: #764FD7;">GoodCrowd.org <br/> Automail Preview Tool</h1>
+      <p style="margin-bottom: 30px">Ein kleines Tool für eine "Quick & Dirty" Automail Vorschau. Es wird bestimmt noch Änderungen im Template geben, aber es hilft hoffentlich für einen realistischeren Eindruck.</p>
+      
+      <div class="editor-section">
+        <h2>Einleitung</h2>
+        <textarea id="intro-text" placeholder="Hier den Einleitungstext eingeben...">Hallo [Vorname],
+
+tolle Neuigkeiten – Du hast gestern neue Spenden erhalten! 🎉 Deine Community an Unterstützer*innen wächst.</textarea>
+        <p class="tip">Diese Einleitung erscheint direkt unter dem Banner.</p>
+      </div>
+      
+      <div class="editor-section">
+        <h2>Hauptinhalt</h2>
+        <textarea id="content-text" class="content-textarea" placeholder="Hier den Hauptinhalt eingeben (Überschriften, Texte, Listen)...">## Deine nächsten Schritte
+
+Wir haben einige wichtige Tipps zusammengestellt, um deine Kampagne zum Erfolg zu führen. Unsere Erfahrung zeigt, dass diese Maßnahmen die Spendenbereitschaft deutlich erhöhen können.
+
+**Diese Punkte solltest du nicht verpassen:**
+
+* **Teile deine Geschichte:** Füge persönliche Details hinzu, die zeigen, warum dein Anliegen wichtig ist.
+* **Nutze soziale Medien:** Teile deine Kampagne regelmäßig in deinen Netzwerken und bitte Freunde um Unterstützung beim Teilen.
+* **Halte alle auf dem Laufenden:** Regelmäßige Updates erhöhen das Vertrauen und motivieren zu weiteren Spenden.
+* Noch ein Bullet ohne Fettung am Anfang.</textarea>
+        <p class="tip">Unterstützt einfaches Markdown: ## für Überschriften, * für Listen, **Text** für Fettdruck.</p>
+      </div>
+      
+      <div class="editor-section">
+        <h2>Fußzeile</h2>
+        <textarea id="footer-text" placeholder="Hier den Fußzeilentext eingeben...">Herzliche Grüße
+Dein GoodCrowd Team</textarea>
+        <p class="tip">Footer am Ende der Mail, Legal-Text bleibt gleicht.</p>
+      </div>
+      
+      <button id="update-preview">Vorschau aktualisieren</button>
+    </div>
+    
+    <!-- Preview Panel -->
+    <div class="preview-panel">
+      <div class="mobile-preview-toggle">
+        <button id="toggle-preview">Zur Vorschau wechseln</button>
+      </div>
+      
+      <div class="preview-toggle">
+        <div class="device-toggle">
+          <button id="desktop-toggle" class="active">Desktop</button>
+          <button id="mobile-toggle">Mobile</button>
+        </div>
+      </div>
+      
+      <div class="preview-container" id="preview-container">
+        <!-- Email Template Preview -->
+        <div class="email-header">
+          <img src="https://d375w6nzl58bw0.cloudfront.net/uploads/e78c3894d2414c711ff22f1e99badfb6bd985d18ac9d1c1c91e4fcdc0bb567be.png" alt="GoodCrowd.org Logo" class="email-logo">
+        </div>
+        
+        <div class="email-container">
+          <!-- Banner Section -->
+          <div class="banner">
+            <div style="font-size: 32px; padding-bottom: 15px;">🎉</div>
+            <div class="banner-title">Neue Spenden für deine Kampagne!</div>
+            <div class="banner-amount">126,00 €</div>
+            <div class="banner-date">28. März 2025</div>
+          </div>
+          
+          <!-- Introduction Section -->
+          <div class="email-content">
+            <div id="preview-intro">
+              <p>Hallo [Vorname],</p>
+              <p>tolle Neuigkeiten – Du hast gestern neue Spenden erhalten! 🎉 Deine Community an Unterstützer*innen wächst.</p>
+            </div>
+          </div>
+          
+          <!-- Main Content Section -->
+          <div class="content-section">
+            <div id="preview-content">
+              <h3>Deine nächsten Schritte</h3>
+              <p>Wir haben einige wichtige Tipps zusammengestellt, um deine Kampagne zum Erfolg zu führen. Unsere Erfahrung zeigt, dass diese Maßnahmen die Spendenbereitschaft deutlich erhöhen können.</p>
+              <p><strong>Diese Punkte solltest du nicht verpassen:</strong></p>
+              <ul>
+                <li><strong>Teile deine Geschichte:</strong> Füge persönliche Details hinzu, die zeigen, warum dein Anliegen wichtig ist.</li>
+                <li><strong>Nutze soziale Medien:</strong> Teile deine Kampagne regelmäßig in deinen Netzwerken und bitte Freunde um Unterstützung beim Teilen.</li>
+                <li><strong>Halte alle auf dem Laufenden:</strong> Regelmäßige Updates erhöhen das Vertrauen und motivieren zu weiteren Spenden.</li>
+                <li>Noch ein Bullet ohne Fettung am Anfang.</li>
+              </ul>
+            </div>
+          </div>
+          
+          <!-- Footer Section -->
+          <div class="email-footer">
+            <div id="preview-footer">
+              <p>Herzliche Grüße<br>Dein GoodCrowd Team</p>
+            </div>
+            <img src="https://d375w6nzl58bw0.cloudfront.net/uploads/dab665cc6329c8c88edbb137bac9a60ad9c2f38f6719a5016b0d1db9182b01b8.png" alt="GoodCrowd.org Logo">
+            <p>Deine soziale Crowdfunding-Plattform aus Deutschland: 100 % sozial – 0 % Profit.</p>
+          </div>
+        </div>
+        
+        <!-- Legal Footer -->
+        <div class="email-legal">
+          <p>Fragen oder Feedback? Schreib uns gerne an <a href="mailto:support@goodcrowd.org">support@goodcrowd.org</a></p>
+          
+          <div class="email-legal-divider"></div>
+          
+          <p><strong>Impressum</strong></p>
+          <p>Good Crowd GmbH, Schlesische Straße 26, 10997 Berlin<br>
+             Geschäftsführung: Timo Kladny<br>
+             Handelsregister: Amtsgericht Berlin Charlottenburg | HRB: 266485 B | Sitz: Berlin</p>
+          
+          <p><a href="https://www.goodcrowd.org/nutzungsbedingungen-allgemein" target="_blank">Allgemeine</a> und <a href="https://www.goodcrowd.org/nutzungsbedingungen-zusaetzlich" target="_blank">zusätzliche Nutzungsbedingungen</a></p>
+          
+          <p style="padding-top: 15px;">
+            <a href="#">Abmelden</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const introTextarea = document.getElementById('intro-text');
+      const contentTextarea = document.getElementById('content-text');
+      const footerTextarea = document.getElementById('footer-text');
+      const updateButton = document.getElementById('update-preview');
+      const toggleButton = document.getElementById('toggle-preview');
+      const desktopToggle = document.getElementById('desktop-toggle');
+      const mobileToggle = document.getElementById('mobile-toggle');
+      const previewContainer = document.getElementById('preview-container');
+      
+      const previewIntro = document.getElementById('preview-intro');
+      const previewContent = document.getElementById('preview-content');
+      const previewFooter = document.getElementById('preview-footer');
+      
+      const editorPanel = document.querySelector('.editor-panel');
+      const previewPanel = document.querySelector('.preview-panel');
+      
+      // Simple markdown converter for the preview
+      function convertMarkdown(text) {
+        // Replace headers (##)
+        text = text.replace(/## (.*?)(\n|$)/g, '<h3>$1</h3>');
+        
+        // Replace bold text (**text**)
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Replace bullet points
+        text = text.replace(/^\* (.*?)$/gm, '<li>$1</li>');
+        
+        // Wrap bullet points in ul tags
+        if (text.includes('<li>')) {
+          // Find blocks of list items
+          text = text.replace(/(<li>.*?<\/li>\n*)+/g, function(match) {
+            return '<ul>' + match + '</ul>';
+          });
+        }
+        
+        // Split text by line breaks
+        let lines = text.split('\n');
+        let result = [];
+        let inParagraph = false;
+        
+        // Process each line
+        for (let i = 0; i < lines.length; i++) {
+          let line = lines[i];
+          
+          // Skip if line is already processed (header, list item, etc.)
+          if (line.startsWith('<h3>') || line.startsWith('<ul>') || 
+              line.startsWith('<li>') || line.startsWith('</ul>') || line.trim() === '') {
+            // If we were in a paragraph, close it
+            if (inParagraph) {
+              result.push('</p>');
+              inParagraph = false;
+            }
+            result.push(line);
+          }
+          // Text content line
+          else {
+            // Start a new paragraph if not already in one
+            if (!inParagraph) {
+              result.push('<p>');
+              inParagraph = true;
+            }
+            // Otherwise add a break for new lines within a paragraph
+            else if (line.trim() !== '') {
+              result.push('<br>');
+            }
+            
+            result.push(line);
+            
+            // If next line is empty or last line, close paragraph
+            if (i === lines.length - 1 || lines[i+1].trim() === '') {
+              result.push('</p>');
+              inParagraph = false;
+            }
+          }
+        }
+        
+        // Close any open paragraph
+        if (inParagraph) {
+          result.push('</p>');
+        }
+        
+        // Join the result and clean up
+        text = result.join('');
+        
+        // Clean up empty paragraphs and fix any duplicate tags
+        text = text.replace(/<p>\s*<\/p>/g, '');
+        text = text.replace(/<p><p>/g, '<p>');
+        text = text.replace(/<\/p><\/p>/g, '</p>');
+        text = text.replace(/<p>\s*<br>/g, '<p>');
+        
+        return text;
+      }
+      
+      // Update preview with content from textareas
+      function updatePreview() {
+        // Handle intro text (simple paragraph conversion)
+        let introText = introTextarea.value;
+        introText = introText.replace(/\n\n/g, '</p><p>');
+        introText = introText.replace(/\n/g, '<br>');
+        introText = '<p>' + introText + '</p>';
+        previewIntro.innerHTML = introText;
+        
+        // Handle content text (with markdown support)
+        let contentText = convertMarkdown(contentTextarea.value);
+        previewContent.innerHTML = contentText;
+        
+        // Handle footer text
+        let footerText = footerTextarea.value;
+        footerText = footerText.replace(/\n/g, '<br>');
+        footerText = '<p>' + footerText + '</p>';
+        previewFooter.innerHTML = footerText;
+      }
+      
+      // Toggle between desktop and mobile preview
+      function toggleMobileView(isMobile) {
+        if (isMobile) {
+          previewContainer.classList.add('mobile');
+          mobileToggle.classList.add('active');
+          desktopToggle.classList.remove('active');
+        } else {
+          previewContainer.classList.remove('mobile');
+          desktopToggle.classList.add('active');
+          mobileToggle.classList.remove('active');
+        }
+      }
+      
+      // Initial preview update
+      updatePreview();
+      
+      // Event listeners
+      updateButton.addEventListener('click', updatePreview);
+      desktopToggle.addEventListener('click', () => toggleMobileView(false));
+      mobileToggle.addEventListener('click', () => toggleMobileView(true));
+    });
+  </script>
+</body>
+</html>
