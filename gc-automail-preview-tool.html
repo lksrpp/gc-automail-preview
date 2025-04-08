@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GoodCrowd.org Automail Preview Tool</title>
+  <title>Automail Preview Tool | GoodCrowd.org</title>
   <style>
     /* Reset and base styles */
     * {
@@ -116,7 +116,7 @@
       margin-bottom: 20px;
     }
     
-    .device-toggle {
+    .device-toggle, .header-toggle {
       display: inline-flex;
       background-color: #f0f0f0;
       border-radius: 30px;
@@ -125,7 +125,7 @@
       margin-bottom: 15px;
     }
     
-    .device-toggle button {
+    .device-toggle button, .header-toggle button {
       background: none;
       border: none;
       padding: 8px 16px;
@@ -138,7 +138,7 @@
       margin: 0;
     }
     
-    .device-toggle button.active {
+    .device-toggle button.active, .header-toggle button.active {
       background-color: #764FD7;
       color: white;
     }
@@ -198,6 +198,13 @@
     .banner-date {
       font-size: 14px;
       opacity: 0.9;
+    }
+    
+    .minimal-banner {
+      height: 10px;
+      background-color: #764FD7;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
     }
     
     .content-section {
@@ -315,6 +322,15 @@
       <p style="margin-bottom: 30px">Ein kleines Tool für eine "Quick & Dirty" Automail Vorschau. Es wird bestimmt noch Änderungen im Template geben, aber es hilft hoffentlich für einen realistischeren Eindruck.</p>
       
       <div class="editor-section">
+        <h2>Header-Stil</h2>
+        <div class="header-toggle editor-header-toggle">
+          <button id="celebration-header-toggle" class="active">Celebration</button>
+          <button id="minimal-header-toggle">Minimal</button>
+        </div>
+        <p class="tip">Wähle zwischen dem Celebration und dem minimalen Header-Design.</p>
+      </div>
+      
+      <div class="editor-section">
         <h2>Einleitung</h2>
         <textarea id="intro-text" placeholder="Hier den Einleitungstext eingeben...">Hallo [Vorname],
 
@@ -367,13 +383,16 @@ Dein GoodCrowd Team</textarea>
         </div>
         
         <div class="email-container">
-          <!-- Banner Section -->
-          <div class="banner">
+          <!-- Celebration Banner Section (default) -->
+          <div id="celebration-banner" class="banner">
             <div style="font-size: 32px; padding-bottom: 15px;">🎉</div>
             <div class="banner-title">Neue Spenden für deine Kampagne!</div>
             <div class="banner-amount">126,00 €</div>
-            <div class="banner-date">28. März 2025</div>
+            <div class="banner-date">am 28. März 2025</div>
           </div>
+          
+          <!-- Minimal Banner Section (hidden by default) -->
+          <div id="minimal-banner" class="minimal-banner" style="display: none;"></div>
           
           <!-- Introduction Section -->
           <div class="email-content">
@@ -446,6 +465,12 @@ Dein GoodCrowd Team</textarea>
       
       const editorPanel = document.querySelector('.editor-panel');
       const previewPanel = document.querySelector('.preview-panel');
+      
+      // Header toggle elements
+      const celebrationHeaderToggle = document.getElementById('celebration-header-toggle');
+      const minimalHeaderToggle = document.getElementById('minimal-header-toggle');
+      const celebrationBanner = document.getElementById('celebration-banner');
+      const minimalBanner = document.getElementById('minimal-banner');
       
       // Simple markdown converter for the preview
       function convertMarkdown(text) {
@@ -557,6 +582,21 @@ Dein GoodCrowd Team</textarea>
         }
       }
       
+      // Toggle between celebration and minimal header
+      function toggleHeaderStyle(isMinimal) {
+        if (isMinimal) {
+          celebrationBanner.style.display = 'none';
+          minimalBanner.style.display = 'block';
+          minimalHeaderToggle.classList.add('active');
+          celebrationHeaderToggle.classList.remove('active');
+        } else {
+          celebrationBanner.style.display = 'block';
+          minimalBanner.style.display = 'none';
+          celebrationHeaderToggle.classList.add('active');
+          minimalHeaderToggle.classList.remove('active');
+        }
+      }
+      
       // Initial preview update
       updatePreview();
       
@@ -564,6 +604,10 @@ Dein GoodCrowd Team</textarea>
       updateButton.addEventListener('click', updatePreview);
       desktopToggle.addEventListener('click', () => toggleMobileView(false));
       mobileToggle.addEventListener('click', () => toggleMobileView(true));
+      
+      // Header style toggle event listeners
+      celebrationHeaderToggle.addEventListener('click', () => toggleHeaderStyle(false));
+      minimalHeaderToggle.addEventListener('click', () => toggleHeaderStyle(true));
     });
   </script>
 </body>
